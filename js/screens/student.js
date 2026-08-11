@@ -30,18 +30,21 @@ function renderChat(root, path){
     <div class="chat-scroll" id="chatScroll">
       ${history.map(m=>`<div class="bubble ${m.who==='me'?'me':'bot'}">${escapeHtml(m.text)}</div>`).join('')}
     </div>
-    <div>
-      <span class="chip disabled">컨텐츠를 추천해요 (P2)</span>
-      <span class="chip on" id="crisisChip">상담 요청하기</span>
-    </div>
-    <div class="chat-inputbar">
-      <span title="음성입력(F-22, 구현예정)">🎙</span>
-      <input id="chatInput" placeholder="너의 이야기를 들려줘" />
-      <button id="chatSend">➤</button>
+    <div class="chat-footer">
+      <div>
+        <span class="chip disabled">컨텐츠를 추천해요 (P2)</span>
+        <span class="chip on" id="crisisChip">상담 요청하기</span>
+      </div>
+      <div class="chat-inputbar">
+        <span title="음성입력(F-22, 구현예정)">🎙</span>
+        <input id="chatInput" placeholder="너의 이야기를 들려줘" />
+        <button id="chatSend">➤</button>
+      </div>
     </div>`;
   renderStudent(root, path, body, {
     title:'다솜이',
     headerExtra:'<button class="icon-btn" data-go="/student/settings">⚙</button>',
+    bodyClass:'chat-body',
   });
 
   root.querySelector('#crisisChip').addEventListener('click', ()=>navigate('/student/crisis'));
