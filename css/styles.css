@@ -31,12 +31,13 @@ button{font-family:inherit;cursor:pointer;}
 .select-card button{width:100%;padding:10px 0;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#fff;font-weight:600;font-size:13.5px;}
 
 /* student shell */
-.student-shell{max-width:430px;margin:0 auto;min-height:100vh;background:var(--paper);display:flex;flex-direction:column;box-shadow:var(--shadow-md);}
+.student-shell{max-width:430px;margin:0 auto;height:100vh;height:100dvh;background:var(--paper);display:flex;flex-direction:column;box-shadow:var(--shadow-md);}
 .student-topbar{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line-soft);position:sticky;top:0;background:var(--paper);z-index:2;}
 .student-topbar .title{font-size:15px;font-weight:700;flex:1;}
 .icon-btn{border:none;background:none;font-size:18px;color:var(--ink-soft);}
 .role-switch{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 10px;font-size:11px;color:var(--ink-soft);}
 .student-body{flex:1;padding:16px;overflow-y:auto;}
+.student-body.chat-body{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;}
 .student-tabbar{display:flex;border-top:1px solid var(--line-soft);position:sticky;bottom:0;background:var(--paper);}
 .student-tabbar button{flex:1;border:none;background:none;padding:10px 0;font-size:11px;color:var(--ink-faint);}
 .student-tabbar button.active{color:var(--accent);font-weight:700;}
@@ -74,10 +75,11 @@ button{font-family:inherit;cursor:pointer;}
 .list-row .sub{font-size:11.5px;color:var(--ink-soft);margin-left:auto;}
 
 /* chat */
-.chat-scroll{display:flex;flex-direction:column;gap:8px;padding-bottom:8px;}
+.chat-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:8px;}
 .bubble{max-width:78%;padding:10px 13px;border-radius:16px;font-size:13px;line-height:1.5;}
 .bubble.bot{background:var(--canvas);align-self:flex-start;border-bottom-left-radius:4px;}
 .bubble.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-footer{flex:none;padding-bottom:16px;}
 .chat-inputbar{display:flex;gap:8px;align-items:center;padding:10px 0 0;border-top:1px solid var(--line-soft);margin-top:10px;}
 .chat-inputbar input{flex:1;border:1px solid var(--line);border-radius:999px;padding:10px 14px;font-size:13px;}
 .chat-inputbar button{border:none;background:var(--accent);color:#fff;width:36px;height:36px;border-radius:50%;font-size:14px;}

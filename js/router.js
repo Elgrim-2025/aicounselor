@@ -31,7 +31,7 @@ function studentShell(path, bodyHtml, opts={}){
       ${opts.headerExtra || ''}
       <button class="role-switch" data-go="/select">역할전환</button>
     </div>
-    <div class="student-body">${bodyHtml}</div>
+    <div class="student-body${opts.bodyClass ? ' ' + opts.bodyClass : ''}">${bodyHtml}</div>
     ${opts.hideTabs ? '' : `<div class="student-tabbar">
       ${STUDENT_TABS.map(t=>`<button data-go="${t.path}" class="${t===activeTab?'active':''}">${t.label}</button>`).join('')}
     </div>`}
