@@ -1,11 +1,5 @@
 import assert from 'node:assert/strict';
-import { classifyIntent, scorePhq9, timeLeftLabel, verifyChain } from './data.js';
-
-// classifyIntent: keyword-based, returns one of 'friend' | 'depressed' | 'study' | 'default'
-assert.equal(classifyIntent('친구들하고 어울리기 힘들어'), 'friend');
-assert.equal(classifyIntent('학교 성적 때문에 너무 힘들어'), 'study');
-assert.equal(classifyIntent('그냥 다 의미 없는 것 같아요'), 'depressed');
-assert.equal(classifyIntent('오늘 날씨 좋다'), 'default');
+import { scorePhq9, timeLeftLabel, verifyChain } from './data.js';
 
 // scorePhq9: 9 answers (0-3 each), item index 8 (0-based) is the override item
 const normalAnswers = [1,1,0,0,1,0,0,1,0];

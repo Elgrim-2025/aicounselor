@@ -1,30 +1,5 @@
 // ---------- pure logic ----------
 
-const INTENT_KEYWORDS = {
-  friend: ['친구', '어울리', '따돌림', '관계'],
-  study: ['성적', '시험', '숙제', '학업', '공부'],
-  depressed: ['의미 없', '사라지고', '죽고', '우울', '힘들어서 못'],
-};
-
-export function classifyIntent(text){
-  for(const [intent, words] of Object.entries(INTENT_KEYWORDS)){
-    if(words.some(w=>text.includes(w))) return intent;
-  }
-  return 'default';
-}
-
-export const CHAT_TEMPLATES = {
-  friend: ['친구 관계 때문에 마음이 힘들었겠다. 조금 더 이야기해줄래?', '혼자 감당하기 버거웠을 것 같아. 어떤 부분이 제일 힘들어?'],
-  study: ['성적 때문에 스트레스가 컸겠다. 요즘 공부는 어떤 식으로 하고 있어?', '노력한 만큼 결과가 안 나오면 속상하지. 지금 제일 부담되는 과목이 뭐야?'],
-  depressed: ['많이 지쳐 보여. 네가 힘든 걸 나도 함께 느끼고 있어.', '그런 생각이 들 정도로 힘들었구나. 조금 더 자세히 말해줄 수 있어?'],
-  default: ['이런.. 무슨 일 있었는지 자세히 말해줄 수 있어?', '힘들었겠다. 더 말해줄래?'],
-};
-
-const CRISIS_WORDS = ['죽고싶', '자해', '사라지고 싶', '죽는 게'];
-export function isCrisisText(text){
-  return CRISIS_WORDS.some(w=>text.includes(w));
-}
-
 const PHQ9_ITEM9_INDEX = 8;
 export function scorePhq9(answers){
   const total = answers.reduce((a,b)=>a+b,0);
@@ -98,9 +73,9 @@ const LS_KEY = 'mock_platform_state_v1';
 
 function loadState(){
   try{
-    return JSON.parse(localStorage.getItem(LS_KEY)) || { chat: [], checkins: [], phq9: null };
+    return JSON.parse(localStorage.getItem(LS_KEY)) || { checkins: [], phq9: null };
   }catch{
-    return { chat: [], checkins: [], phq9: null };
+    return { checkins: [], phq9: null };
   }
 }
 function saveState(state){
@@ -108,13 +83,6 @@ function saveState(state){
 }
 
 export function getState(){ return loadState(); }
-
-export function appendChat(entry){
-  const state = loadState();
-  state.chat.push(entry);
-  saveState(state);
-  return state.chat;
-}
 
 export function appendCheckin(entry){
   const state = loadState();
