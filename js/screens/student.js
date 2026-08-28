@@ -113,6 +113,7 @@ function bindPlayerControls(root, path, scenario, finished){
     return;
   }
   root.querySelector('#scenarioPause').addEventListener('click', ()=>{
+    clearTimeout(playTimer);
     playing = !playing;
     renderChat(root, path);
     if(playing) startPlayback(root, path, scenario);
@@ -160,7 +161,7 @@ function renderChatPlayer(root, path, scenario){
       </div>
       ${controlsHtml}
     </div>`;
-  renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, bodyClass:'chat-body' });
+  renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, bodyClass:'chat-body', hideTabs:true });
   bindPlayerControls(root, path, scenario, finished);
   const scroll = root.querySelector('#chatScroll');
   if(scroll) scroll.scrollTop = scroll.scrollHeight;
