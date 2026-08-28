@@ -1,69 +1,210 @@
-import { registerRoute, renderStudent, navigate } from '../router.js';
+import { registerRoute, renderStudent } from '../router.js';
 import {
-  classifyIntent, isCrisisText, CHAT_TEMPLATES,
-  appendChat, appendCheckin, getState,
+  appendCheckin, getState,
   PHQ9_QUESTIONS, PHQ9_OPTIONS, scorePhq9, savePhq9Result,
 } from '../data.js';
 import { comingSoonBody } from '../components.js';
+import { SCENARIOS, scoreSurvey } from '../scenarios.js';
 
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function pick(list){ return list[Math.floor(Math.random()*list.length)]; }
 
-// ---------- Chat (F-02/F-22, P0) ----------
+// ---------- Chat: scenario picker + player (F-02, P0) ----------
 
-const SEED_CHAT = [
-  { who:'bot', text:'요즘 마음이 우울했구나. 어떤 문제 때문에 힘들어?' },
-  { who:'me', text:'학교 생활이 괴로워' },
-  { who:'bot', text:'이런.. 무슨 일 있었는지 자세히 말해줄 수 있어?' },
-  { who:'me', text:'친구들하고 어울리기 힘들어..' },
-  { who:'bot', text:'힘들었겠다. 더 말해줄래?' },
-];
+const EXIT_BTN = '<button class="icon-btn" id="scenarioExit" title="목록으로">✕</button>';
+const TYPING_MS = 800;
 
-function chatHistory(){
-  const state = getState();
-  return [...SEED_CHAT, ...state.chat];
+let activeScenarioId = null;   // null => picker screen
+let revealCount = 0;           // turns (chat) or questions (survey) revealed so far
+let showTyping = false;        // chat: typing indicator currently shown
+let surveyHighlighted = false; // survey: current question's answer currently highlighted
+let playing = true;
+let playTimer = null;
+
+function turnDelay(turn){
+  const len = (turn.text || '').length;
+  return Math.min(1200, 800 + len * 6);
 }
 
-function renderChat(root, path){
-  const history = chatHistory();
-  const body = `
-    <div class="chat-scroll" id="chatScroll">
-      ${history.map(m=>`<div class="bubble ${m.who==='me'?'me':'bot'}">${escapeHtml(m.text)}</div>`).join('')}
-    </div>
-    <div class="chat-footer">
-      <div>
-        <span class="chip disabled">컨텐츠를 추천해요 (P2)</span>
-        <span class="chip on" id="crisisChip">상담 요청하기</span>
-      </div>
-      <div class="chat-inputbar">
-        <span title="음성입력(F-22, 구현예정)">🎙</span>
-        <input id="chatInput" placeholder="너의 이야기를 들려줘" />
-        <button id="chatSend">➤</button>
-      </div>
+function turnBubbleHtml(turn){
+  if(turn.type === 'photo'){
+    return `<div class="bubble ${turn.who} photo">
+      <div class="photo-thumb">🖼️</div>
+      <div class="photo-filename">사진.jpg</div>
     </div>`;
+  }
+  return `<div class="bubble ${turn.who}">${escapeHtml(turn.text)}</div>`;
+}
+
+function resetPlaybackState(){
+  clearTimeout(playTimer);
+  revealCount = 0;
+  showTyping = false;
+  surveyHighlighted = false;
+  playing = true;
+}
+
+function exitScenario(root, path){
+  clearTimeout(playTimer);
+  activeScenarioId = null;
+  resetPlaybackState();
+  renderChat(root, path);
+}
+
+function restartScenario(root, path, scenario){
+  resetPlaybackState();
+  renderChat(root, path);
+  startPlayback(root, path, scenario);
+}
+
+function startPlayback(root, path, scenario){
+  if(scenario.type === 'survey') scheduleSurveyNext(root, path, scenario);
+  else scheduleNext(root, path, scenario);
+}
+
+function scheduleNext(root, path, scenario){
+  clearTimeout(playTimer);
+  if(!playing || revealCount >= scenario.turns.length) return;
+  const next = scenario.turns[revealCount];
+  if(next.who === 'bot' && !showTyping){
+    showTyping = true;
+    renderChat(root, path);
+    playTimer = setTimeout(()=>{
+      if(location.hash.slice(1) !== path) return;
+      showTyping = false;
+      revealCount++;
+      renderChat(root, path);
+      scheduleNext(root, path, scenario);
+    }, TYPING_MS);
+  } else {
+    playTimer = setTimeout(()=>{
+      if(location.hash.slice(1) !== path) return;
+      revealCount++;
+      renderChat(root, path);
+      scheduleNext(root, path, scenario);
+    }, turnDelay(next));
+  }
+}
+
+function scheduleSurveyNext(root, path, scenario){
+  clearTimeout(playTimer);
+  if(!playing || revealCount >= scenario.questions.length) return;
+  if(!surveyHighlighted){
+    playTimer = setTimeout(()=>{
+      if(location.hash.slice(1) !== path) return;
+      surveyHighlighted = true;
+      renderChat(root, path);
+      scheduleSurveyNext(root, path, scenario);
+    }, 500);
+  } else {
+    playTimer = setTimeout(()=>{
+      if(location.hash.slice(1) !== path) return;
+      surveyHighlighted = false;
+      revealCount++;
+      renderChat(root, path);
+      scheduleSurveyNext(root, path, scenario);
+    }, 900);
+  }
+}
+
+function bindPlayerControls(root, path, scenario, finished){
+  root.querySelector('#scenarioExit').addEventListener('click', ()=>exitScenario(root, path));
+  if(finished){
+    root.querySelector('#scenarioBack').addEventListener('click', ()=>exitScenario(root, path));
+    return;
+  }
+  root.querySelector('#scenarioPause').addEventListener('click', ()=>{
+    playing = !playing;
+    renderChat(root, path);
+    if(playing) startPlayback(root, path, scenario);
+  });
+  root.querySelector('#scenarioRestart').addEventListener('click', ()=>restartScenario(root, path, scenario));
+}
+
+function renderScenarioPicker(root, path){
+  const body = SCENARIOS.map(s => `
+    <div class="scenario-card" data-scenario="${s.id}">
+      <div class="emoji">${s.emoji}</div>
+      <div class="grow"><b>${s.title}</b><span>${s.subtitle}</span></div>
+      <div class="chev">›</div>
+    </div>`).join('');
   renderStudent(root, path, body, {
     title:'다솜이',
     headerExtra:'<button class="icon-btn" data-go="/student/settings">⚙</button>',
-    bodyClass:'chat-body',
   });
+  root.querySelectorAll('[data-scenario]').forEach(el =>
+    el.addEventListener('click', ()=>{
+      const scenario = SCENARIOS.find(s => s.id === el.dataset.scenario);
+      activeScenarioId = scenario.id;
+      resetPlaybackState();
+      renderChat(root, path);
+      startPlayback(root, path, scenario);
+    }));
+}
 
-  root.querySelector('#crisisChip').addEventListener('click', ()=>navigate('/student/crisis'));
-  const input = root.querySelector('#chatInput');
-  const send = ()=>{
-    const text = input.value.trim();
-    if(!text) return;
-    appendChat({ who:'me', text });
-    const reply = isCrisisText(text)
-      ? '많이 힘들었겠다. 상담사 선생님께 바로 알려드렸어. 곧 연락드릴 거야. 지금 이 순간이 힘들면 1388로 전화해도 괜찮아.'
-      : pick(CHAT_TEMPLATES[classifyIntent(text)]);
-    appendChat({ who:'bot', text: reply });
-    input.value = '';
-    renderChat(root, path);
-  };
-  root.querySelector('#chatSend').addEventListener('click', send);
-  input.addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
+function renderChatPlayer(root, path, scenario){
+  const finished = revealCount >= scenario.turns.length;
+  const shown = scenario.turns.slice(0, revealCount).map(turnBubbleHtml).join('');
+  const typingHtml = showTyping ? `<div class="bubble bot typing"><span></span><span></span><span></span></div>` : '';
+  const controlsHtml = finished
+    ? `<button class="btn primary block" id="scenarioBack" style="margin-top:8px;">다른 시나리오 보기</button>`
+    : `<div class="scenario-controls">
+         <button id="scenarioPause">${playing ? '⏸ 일시정지' : '▶ 재생'}</button>
+         <button id="scenarioRestart">↺ 처음부터</button>
+       </div>`;
+  const body = `
+    <div class="chat-scroll" id="chatScroll">${shown}${typingHtml}</div>
+    <div class="chat-footer">
+      <div>
+        <span class="chip disabled">컨텐츠를 추천해요</span>
+        <span class="chip disabled">상담 요청하기</span>
+      </div>
+      ${controlsHtml}
+    </div>`;
+  renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, bodyClass:'chat-body' });
+  bindPlayerControls(root, path, scenario, finished);
   const scroll = root.querySelector('#chatScroll');
-  scroll.scrollTop = scroll.scrollHeight;
+  if(scroll) scroll.scrollTop = scroll.scrollHeight;
+}
+
+function renderSurveyPlayer(root, path, scenario){
+  const finished = revealCount >= scenario.questions.length;
+  let body;
+  if(finished){
+    const { categories, topCategory } = scoreSurvey(scenario.questions);
+    body = `
+      <div class="survey-summary">
+        <p style="color:var(--ink-soft);font-size:13px;">다솜이의 이번 설문 결과가 정리됐어요</p>
+        <div class="summary-row">
+          ${categories.map(c=>`<div class="summary-box"><div class="num">${c.avg}</div><div class="lbl">${c.name}</div></div>`).join('')}
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);">${topCategory} 영역 점수가 다른 영역보다 조금 높아요.</p>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-top:10px;">${scenario.outro}</p>
+        <button class="btn primary block" id="scenarioBack" style="margin-top:14px;">다른 시나리오 보기</button>
+      </div>`;
+    renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, hideTabs:true });
+  } else {
+    const q = scenario.questions[revealCount];
+    body = `
+      <div class="progress-track"><div class="progress-fill" style="width:${((revealCount+1)/scenario.questions.length)*100}%;"></div></div>
+      <p style="color:var(--ink-soft);font-size:12px;">${q.category}</p>
+      <h3 style="font-size:15px;">${escapeHtml(q.text)}</h3>
+      <div class="likert-row">
+        ${scenario.scaleOptions.map((opt,i)=>`<button class="${surveyHighlighted && i===q.answerIndex ? 'selected':''}">${opt}</button>`).join('')}
+      </div>
+      <div class="scenario-controls" style="margin-top:20px;">
+        <button id="scenarioPause">${playing ? '⏸ 일시정지' : '▶ 재생'}</button>
+        <button id="scenarioRestart">↺ 처음부터</button>
+      </div>`;
+    renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, hideTabs:true });
+  }
+  bindPlayerControls(root, path, scenario, finished);
+}
+
+function renderChat(root, path){
+  if(!activeScenarioId){ renderScenarioPicker(root, path); return; }
+  const scenario = SCENARIOS.find(s => s.id === activeScenarioId);
+  if(scenario.type === 'survey') renderSurveyPlayer(root, path, scenario);
+  else renderChatPlayer(root, path, scenario);
 }
 
 registerRoute('/student/chat', renderChat);
