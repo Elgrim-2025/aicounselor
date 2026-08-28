@@ -4,7 +4,7 @@
     {
       "name": "static",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["-y", "serve", "-l", "4173", "/Users/kangchanghwan/Documents/elgrim/studentAIMock"],
+      "runtimeArgs": ["-y", "serve", "-l", "4173", "."],
       "port": 4173
     }
   ]
