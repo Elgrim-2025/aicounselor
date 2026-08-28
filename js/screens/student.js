@@ -78,6 +78,7 @@ function scheduleNext(root, path, scenario){
   } else {
     playTimer = setTimeout(()=>{
       if(location.hash.slice(1) !== path) return;
+      showTyping = false;
       revealCount++;
       renderChat(root, path);
       scheduleNext(root, path, scenario);
