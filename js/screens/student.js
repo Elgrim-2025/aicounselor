@@ -208,7 +208,18 @@ function renderChat(root, path){
   else renderChatPlayer(root, path, scenario);
 }
 
-registerRoute('/student/chat', renderChat);
+function resumePlaybackIfNeeded(root, path){
+  if(!activeScenarioId || !playing) return;
+  const scenario = SCENARIOS.find(s => s.id === activeScenarioId);
+  if(!scenario) return;
+  const total = scenario.type === 'survey' ? scenario.questions.length : scenario.turns.length;
+  if(revealCount < total) startPlayback(root, path, scenario);
+}
+
+registerRoute('/student/chat', (root, path) => {
+  renderChat(root, path);
+  resumePlaybackIfNeeded(root, path);
+});
 
 // ---------- Check-in (F-03, P0) ----------
 
