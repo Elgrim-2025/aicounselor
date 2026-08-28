@@ -1,6 +1,6 @@
 # 시나리오 기반 고정 대화 애니메이션 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the free-input keyword-matched chat on `/student/chat` with 4 pre-scripted, auto-playing chat scenarios (school violence w/ photo-evidence turn, depression, career guidance, and a score-based digitized survey), per `docs/superpowers/specs/2026-08-28-scenario-based-counseling-design.md`.
 
@@ -33,7 +33,7 @@ now internally branches on module-scope state.
 - Create: `js/scenarios.js`
 - Test: `js/scenarios.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `js/scenarios.test.js`:
 
@@ -61,12 +61,12 @@ assert.equal(result.topCategory, '스트레스');
 console.log('All scenarios.js tests passed.');
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `node js/scenarios.test.js`
 Expected: `Error [ERR_MODULE_NOT_FOUND]` — `js/scenarios.js` doesn't exist yet.
 
-- [ ] **Step 3: Create `js/scenarios.js`**
+- [x] **Step 3: Create `js/scenarios.js`**
 
 ```js
 export const SCENARIOS = [
@@ -172,12 +172,12 @@ export function scoreSurvey(questions){
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `node js/scenarios.test.js`
 Expected: `All scenarios.js tests passed.`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add js/scenarios.js js/scenarios.test.js
@@ -192,7 +192,7 @@ git commit -m "feat: add scenario data module with 4 scripted counseling scenari
 - Modify: `js/data.js`
 - Modify: `js/data.test.js`
 
-- [ ] **Step 1: Remove `classifyIntent`, `CHAT_TEMPLATES`, `isCrisisText` from `js/data.js`**
+- [x] **Step 1: Remove `classifyIntent`, `CHAT_TEMPLATES`, `isCrisisText` from `js/data.js`**
 
 Find this block at the top of `js/data.js` (lines 1–27):
 
@@ -235,7 +235,7 @@ Replace it with:
 const PHQ9_ITEM9_INDEX = 8;
 ```
 
-- [ ] **Step 2: Remove `appendChat` from `js/data.js`**
+- [x] **Step 2: Remove `appendChat` from `js/data.js`**
 
 Find:
 
@@ -256,7 +256,7 @@ Replace with:
 export function appendCheckin(entry){
 ```
 
-- [ ] **Step 3: Remove the unused `chat` field from `loadState()`'s default state**
+- [x] **Step 3: Remove the unused `chat` field from `loadState()`'s default state**
 
 Find:
 
@@ -282,7 +282,7 @@ function loadState(){
 }
 ```
 
-- [ ] **Step 4: Remove the `classifyIntent` test block from `js/data.test.js`**
+- [x] **Step 4: Remove the `classifyIntent` test block from `js/data.test.js`**
 
 Find:
 
@@ -308,7 +308,7 @@ import { scorePhq9, timeLeftLabel, verifyChain } from './data.js';
 // scorePhq9: 9 answers (0-3 each), item index 8 (0-based) is the override item
 ```
 
-- [ ] **Step 5: Run tests to verify they still pass**
+- [x] **Step 5: Run tests to verify they still pass**
 
 Run: `node js/data.test.js`
 Expected: `All data.js tests passed.`
@@ -316,7 +316,7 @@ Expected: `All data.js tests passed.`
 Run: `node js/scenarios.test.js`
 Expected: `All scenarios.js tests passed.`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add js/data.js js/data.test.js
@@ -330,7 +330,7 @@ git commit -m "refactor: remove free-input chat keyword-matching logic, now unus
 **Files:**
 - Modify: `css/styles.css`
 
-- [ ] **Step 1: Append scenario playback styles to `css/styles.css`**
+- [x] **Step 1: Append scenario playback styles to `css/styles.css`**
 
 Add this block at the end of the file:
 
@@ -364,7 +364,7 @@ Add this block at the end of the file:
 .summary-box .lbl{font-size:11px;color:var(--ink-soft);margin-top:2px;}
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add css/styles.css
@@ -378,7 +378,7 @@ git commit -m "style: add scenario picker/player, typing indicator, photo bubble
 **Files:**
 - Modify: `js/screens/student.js`
 
-- [ ] **Step 1: Replace imports at the top of `js/screens/student.js`**
+- [x] **Step 1: Replace imports at the top of `js/screens/student.js`**
 
 Find:
 
@@ -669,13 +669,13 @@ function renderChat(root, path){
 registerRoute('/student/chat', renderChat);
 ```
 
-- [ ] **Step 2: Manually sanity-check the diff**
+- [x] **Step 2: Manually sanity-check the diff**
 
 Run: `git diff js/screens/student.js`
 Expected: only the imports + chat section changed; the check-in, tests, crisis, settings,
 and P2 coming-soon sections below are untouched.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add js/screens/student.js
@@ -688,18 +688,18 @@ git commit -m "feat: replace free-input chat with scripted scenario picker + pla
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Start the static server and open the app**
+- [x] **Step 1: Start the static server and open the app**
 
 Use the Browser preview tool (or `npx serve .`) to open `index.html`, then navigate to
 `#/student/chat` after picking "학생화면으로 접속".
 
-- [ ] **Step 2: Verify the picker screen**
+- [x] **Step 2: Verify the picker screen**
 
 Confirm 4 cards appear in order: 🚨 학교폭력 피해, 💧 우울감·무기력, 🧭 진로 고민,
 📋 마음 설문조사. Confirm the ⚙ settings icon and the bottom tab bar (채팅/감정일기/검사/리포트)
 are still present and the 채팅 tab is highlighted active.
 
-- [ ] **Step 3: Verify the 🚨 학교폭력 피해 scenario**
+- [x] **Step 3: Verify the 🚨 학교폭력 피해 scenario**
 
 Click the card. Confirm: a typing indicator briefly appears before each bot bubble, turns
 appear one at a time and auto-scroll into view, the photo turn renders as a gray thumbnail
@@ -707,19 +707,19 @@ with a "사진.jpg" filename bar (not the input textbox, not a real image), and 
 last bot turn a "다른 시나리오 보기" button appears (no more pause/restart controls).
 Click it and confirm it returns to the picker screen.
 
-- [ ] **Step 4: Verify pause/resume and restart mid-playback**
+- [x] **Step 4: Verify pause/resume and restart mid-playback**
 
 Re-open the 💧 우울감·무기력 scenario. While it's mid-playback, click "⏸ 일시정지" and
 confirm no new bubbles appear while paused. Click "▶ 재생" and confirm playback resumes
 from the same point (not from the start). Click "↺ 처음부터" and confirm the bubble list
 clears and playback restarts from turn 1.
 
-- [ ] **Step 5: Verify the ✕ exit button**
+- [x] **Step 5: Verify the ✕ exit button**
 
 Mid-playback on the 🧭 진로 고민 scenario, click the ✕ button in the top bar. Confirm it
 returns immediately to the picker screen (not to the settings screen or a blank screen).
 
-- [ ] **Step 6: Verify the 📋 마음 설문조사 scenario**
+- [x] **Step 6: Verify the 📋 마음 설문조사 scenario**
 
 Click the card. Confirm the screen switches to the PHQ-9-style question card layout
 (progress bar + `likert-row` buttons, bottom tab bar hidden) with no scenario intro
@@ -729,7 +729,7 @@ bubbles — question 1 shows immediately. Watch the scripted answer button highl
 스트레스 1.5 — the sentence "스트레스 영역 점수가 다른 영역보다 조금 높아요.", the
 outro sentence about teachers, and a "다른 시나리오 보기" button.
 
-- [ ] **Step 7: Verify disabled footer chips and navigation don't break**
+- [x] **Step 7: Verify disabled footer chips and navigation don't break**
 
 On any chat-type scenario mid-playback, confirm the "컨텐츠를 추천해요" and "상담
 요청하기" chips render with the disabled (dimmed) style and clicking them does nothing.
@@ -737,7 +737,7 @@ Start a scenario, then click the "검사" bottom tab before it finishes; confirm
 list renders normally and open the browser console to confirm no errors are logged (this
 checks the playback timer's stale-navigation guard).
 
-- [ ] **Step 8: Re-run the automated tests**
+- [x] **Step 8: Re-run the automated tests**
 
 Run: `node js/data.test.js`
 Expected: `All data.js tests passed.`
@@ -745,7 +745,7 @@ Expected: `All data.js tests passed.`
 Run: `node js/scenarios.test.js`
 Expected: `All scenarios.js tests passed.`
 
-- [ ] **Step 9: Commit any fixes found during manual QA**
+- [x] **Step 9: Commit any fixes found during manual QA**
 
 If Steps 2–8 surfaced bugs, fix them in the relevant file(s) and commit:
 
