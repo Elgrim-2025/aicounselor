@@ -1,4 +1,4 @@
-import { registerRoute, renderStudent } from '../router.js';
+import { registerRoute, renderStudent, navigate } from '../router.js';
 import {
   appendCheckin, getState,
   PHQ9_QUESTIONS, PHQ9_OPTIONS, scorePhq9, savePhq9Result,
