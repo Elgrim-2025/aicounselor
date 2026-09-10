@@ -3,87 +3,39 @@ import {
   appendCheckin, getState,
   PHQ9_QUESTIONS, PHQ9_OPTIONS, scorePhq9, savePhq9Result,
 } from '../data.js';
-import { comingSoonBody } from '../components.js';
+import { comingSoonBody, escapeHtml } from '../components.js';
 import { SCENARIOS, scoreSurvey } from '../scenarios.js';
-
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+import { mountChatSession, destroyChatSession } from './chat-session.js';
 
 // ---------- Chat: scenario picker + player (F-02, P0) ----------
 
 const EXIT_BTN = '<button class="icon-btn" id="scenarioExit" title="목록으로">✕</button>';
-const TYPING_MS = 800;
 
 let activeScenarioId = null;   // null => picker screen
-let revealCount = 0;           // turns (chat) or questions (survey) revealed so far
-let showTyping = false;        // chat: typing indicator currently shown
+let revealCount = 0;           // survey: questions revealed so far
 let surveyHighlighted = false; // survey: current question's answer currently highlighted
 let playing = true;
 let playTimer = null;
 
-function turnDelay(turn){
-  const len = (turn.text || '').length;
-  return Math.min(1200, 800 + len * 6);
-}
-
-function turnBubbleHtml(turn){
-  if(turn.type === 'photo'){
-    return `<div class="bubble ${turn.who} photo">
-      <div class="photo-thumb">🖼️</div>
-      <div class="photo-filename">사진.jpg</div>
-    </div>`;
-  }
-  return `<div class="bubble ${turn.who}">${escapeHtml(turn.text)}</div>`;
-}
-
 function resetPlaybackState(){
   clearTimeout(playTimer);
   revealCount = 0;
-  showTyping = false;
   surveyHighlighted = false;
   playing = true;
 }
 
 function exitScenario(root, path){
   clearTimeout(playTimer);
+  destroyChatSession();
   activeScenarioId = null;
   resetPlaybackState();
   renderChat(root, path);
 }
 
-function restartScenario(root, path, scenario){
+function restartSurvey(root, path, scenario){
   resetPlaybackState();
   renderChat(root, path);
-  startPlayback(root, path, scenario);
-}
-
-function startPlayback(root, path, scenario){
-  if(scenario.type === 'survey') scheduleSurveyNext(root, path, scenario);
-  else scheduleNext(root, path, scenario);
-}
-
-function scheduleNext(root, path, scenario){
-  clearTimeout(playTimer);
-  if(!playing || revealCount >= scenario.turns.length) return;
-  const next = scenario.turns[revealCount];
-  if(next.who === 'bot' && !showTyping){
-    showTyping = true;
-    renderChat(root, path);
-    playTimer = setTimeout(()=>{
-      if(location.hash.slice(1) !== path) return;
-      showTyping = false;
-      revealCount++;
-      renderChat(root, path);
-      scheduleNext(root, path, scenario);
-    }, TYPING_MS);
-  } else {
-    playTimer = setTimeout(()=>{
-      if(location.hash.slice(1) !== path) return;
-      showTyping = false;
-      revealCount++;
-      renderChat(root, path);
-      scheduleNext(root, path, scenario);
-    }, turnDelay(next));
-  }
+  scheduleSurveyNext(root, path, scenario);
 }
 
 function scheduleSurveyNext(root, path, scenario){
@@ -107,7 +59,7 @@ function scheduleSurveyNext(root, path, scenario){
   }
 }
 
-function bindPlayerControls(root, path, scenario, finished){
+function bindSurveyControls(root, path, scenario, finished){
   root.querySelector('#scenarioExit').addEventListener('click', ()=>exitScenario(root, path));
   if(finished){
     root.querySelector('#scenarioBack').addEventListener('click', ()=>exitScenario(root, path));
@@ -117,9 +69,9 @@ function bindPlayerControls(root, path, scenario, finished){
     clearTimeout(playTimer);
     playing = !playing;
     renderChat(root, path);
-    if(playing) startPlayback(root, path, scenario);
+    if(playing) scheduleSurveyNext(root, path, scenario);
   });
-  root.querySelector('#scenarioRestart').addEventListener('click', ()=>restartScenario(root, path, scenario));
+  root.querySelector('#scenarioRestart').addEventListener('click', ()=>restartSurvey(root, path, scenario));
 }
 
 function renderScenarioPicker(root, path){
@@ -139,33 +91,8 @@ function renderScenarioPicker(root, path){
       activeScenarioId = scenario.id;
       resetPlaybackState();
       renderChat(root, path);
-      startPlayback(root, path, scenario);
+      if(scenario.type === 'survey') scheduleSurveyNext(root, path, scenario);
     }));
-}
-
-function renderChatPlayer(root, path, scenario){
-  const finished = revealCount >= scenario.turns.length;
-  const shown = scenario.turns.slice(0, revealCount).map(turnBubbleHtml).join('');
-  const typingHtml = showTyping ? `<div class="bubble bot typing"><span></span><span></span><span></span></div>` : '';
-  const controlsHtml = finished
-    ? `<button class="btn primary block" id="scenarioBack" style="margin-top:8px;">다른 시나리오 보기</button>`
-    : `<div class="scenario-controls">
-         <button id="scenarioPause">${playing ? '⏸ 일시정지' : '▶ 재생'}</button>
-         <button id="scenarioRestart">↺ 처음부터</button>
-       </div>`;
-  const body = `
-    <div class="chat-scroll" id="chatScroll">${shown}${typingHtml}</div>
-    <div class="chat-footer">
-      <div>
-        <span class="chip disabled">컨텐츠를 추천해요</span>
-        <span class="chip disabled">상담 요청하기</span>
-      </div>
-      ${controlsHtml}
-    </div>`;
-  renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, bodyClass:'chat-body', hideTabs:true });
-  bindPlayerControls(root, path, scenario, finished);
-  const scroll = root.querySelector('#chatScroll');
-  if(scroll) scroll.scrollTop = scroll.scrollHeight;
 }
 
 function renderSurveyPlayer(root, path, scenario){
@@ -199,27 +126,26 @@ function renderSurveyPlayer(root, path, scenario){
       </div>`;
     renderStudent(root, path, body, { title: scenario.title, headerExtra: EXIT_BTN, hideTabs:true });
   }
-  bindPlayerControls(root, path, scenario, finished);
+  bindSurveyControls(root, path, scenario, finished);
 }
 
 function renderChat(root, path){
   if(!activeScenarioId){ renderScenarioPicker(root, path); return; }
   const scenario = SCENARIOS.find(s => s.id === activeScenarioId);
   if(scenario.type === 'survey') renderSurveyPlayer(root, path, scenario);
-  else renderChatPlayer(root, path, scenario);
+  else mountChatSession(root, path, scenario, { onExit: () => exitScenario(root, path) });
 }
 
-function resumePlaybackIfNeeded(root, path){
+function resumeSurveyIfNeeded(root, path){
   if(!activeScenarioId || !playing) return;
   const scenario = SCENARIOS.find(s => s.id === activeScenarioId);
-  if(!scenario) return;
-  const total = scenario.type === 'survey' ? scenario.questions.length : scenario.turns.length;
-  if(revealCount < total) startPlayback(root, path, scenario);
+  if(!scenario || scenario.type !== 'survey') return;
+  if(revealCount < scenario.questions.length) scheduleSurveyNext(root, path, scenario);
 }
 
 registerRoute('/student/chat', (root, path) => {
   renderChat(root, path);
-  resumePlaybackIfNeeded(root, path);
+  resumeSurveyIfNeeded(root, path);
 });
 
 // ---------- Check-in (F-03, P0) ----------
