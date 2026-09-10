@@ -31,8 +31,6 @@ function createSession(scenario){
 
 // ---------- public API ----------
 
-export function hasChatSession(){ return !!session; }
-
 // Enter (or re-enter after a route change) the chat player for `scenario`.
 export function mountChatSession(root, path, scenario, { onExit }){
   if(ui) unmount();

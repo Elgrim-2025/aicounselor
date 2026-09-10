@@ -32,7 +32,7 @@ css/styles.css               modified — affect strip, banners, input bar, wave
 - Create: `js/affect.js`
 - Test: `js/affect.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `js/affect.test.js`:
 
@@ -82,12 +82,12 @@ assert.deepEqual(combineRisk({ text: 0.89, face: 0.6, voice: 0.5 }), { score: 0.
 console.log('All affect.js tests passed.');
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `node js/affect.test.js`
 Expected: `Error [ERR_MODULE_NOT_FOUND]` — `js/affect.js` doesn't exist yet.
 
-- [ ] **Step 3: Create `js/affect.js`**
+- [x] **Step 3: Create `js/affect.js`**
 
 ```js
 // Multimodal affect / risk heuristics for the demo. Pure functions, no DOM.
@@ -160,12 +160,12 @@ export function combineRisk({ text = 0, face = 0, voice = 0 } = {}){
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `node js/affect.test.js`
 Expected: `All affect.js tests passed.`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add js/affect.js js/affect.test.js
@@ -181,7 +181,7 @@ git commit -m "feat: add multimodal affect/risk heuristics module with tests"
 
 No node test (browser-only API); verified in the browser in Task 7.
 
-- [ ] **Step 1: Create `js/media/tts.js`**
+- [x] **Step 1: Create `js/media/tts.js`**
 
 ```js
 // Bot-bubble "read aloud". Uses browser speechSynthesis with a Korean voice when one
@@ -235,7 +235,7 @@ export function cancel(){
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add js/media/tts.js
@@ -249,7 +249,7 @@ git commit -m "feat: add TTS helper (speechSynthesis ko voice or simulated timer
 **Files:**
 - Create: `js/media/recorder.js`
 
-- [ ] **Step 1: Create `js/media/recorder.js`**
+- [x] **Step 1: Create `js/media/recorder.js`**
 
 ```js
 // Microphone capture for the "recording" input state. Only RMS levels are kept (for
@@ -335,7 +335,7 @@ export function formatElapsed(ms){
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add js/media/recorder.js
@@ -349,7 +349,7 @@ git commit -m "feat: add mic recorder with RMS levels and waveform renderer"
 **Files:**
 - Create: `js/media/camera.js`
 
-- [ ] **Step 1: Create `js/media/camera.js`**
+- [x] **Step 1: Create `js/media/camera.js`**
 
 ```js
 // Always-on camera analysis for a counseling session. Real getUserMedia video +
@@ -484,7 +484,7 @@ export class CameraSession {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add js/media/camera.js
@@ -499,7 +499,7 @@ git commit -m "feat: add camera session with MediaPipe FaceLandmarker overlay"
 - Modify: `js/components.js`
 - Modify: `js/screens/student.js:9` (remove local `escapeHtml`, import instead)
 
-- [ ] **Step 1: Export from components.js** — append to `js/components.js`:
+- [x] **Step 1: Export from components.js** — append to `js/components.js`:
 
 ```js
 export function escapeHtml(s){
@@ -507,7 +507,7 @@ export function escapeHtml(s){
 }
 ```
 
-- [ ] **Step 2: In `js/screens/student.js`** replace the local definition line
+- [x] **Step 2: In `js/screens/student.js`** replace the local definition line
 
 ```js
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -519,12 +519,12 @@ with nothing, and change the components import to:
 import { comingSoonBody, escapeHtml } from '../components.js';
 ```
 
-- [ ] **Step 3: Verify nothing else broke**
+- [x] **Step 3: Verify nothing else broke**
 
 Run: `node js/data.test.js && node js/scenarios.test.js`
 Expected: both "passed" lines.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add js/components.js js/screens/student.js
@@ -539,7 +539,7 @@ git commit -m "refactor: share escapeHtml via components.js"
 - Create: `js/screens/chat-session.js`
 - Modify: `css/styles.css` (append)
 
-- [ ] **Step 1: Create `js/screens/chat-session.js`**
+- [x] **Step 1: Create `js/screens/chat-session.js`**
 
 ```js
 // Chat-type scenario player with text/voice input, TTS, always-on camera affect strip,
@@ -1000,7 +1000,7 @@ function updateRisk(){
 }
 ```
 
-- [ ] **Step 2: Append styles to `css/styles.css`**
+- [x] **Step 2: Append styles to `css/styles.css`**
 
 ```css
 /* ---------- chat session: affect strip ---------- */
@@ -1082,7 +1082,7 @@ Also change the existing `.student-shell` rule to add `position:relative;` so `.
 .student-shell{position:relative;max-width:430px;margin:0 auto;height:100vh;height:100dvh;background:var(--paper);display:flex;flex-direction:column;box-shadow:var(--shadow-md);}
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add js/screens/chat-session.js css/styles.css
@@ -1096,7 +1096,7 @@ git commit -m "feat: add chat session player with voice input, TTS, camera affec
 **Files:**
 - Modify: `js/screens/student.js:11-180`
 
-- [ ] **Step 1: Replace the chat section**
+- [x] **Step 1: Replace the chat section**
 
 Replace everything from `// ---------- Chat: scenario picker + player (F-02, P0) ----------` down to (and including) the `registerRoute('/student/chat', ...)` block with:
 
@@ -1248,17 +1248,17 @@ registerRoute('/student/chat', (root, path) => {
 });
 ```
 
-- [ ] **Step 2: Run the node tests**
+- [x] **Step 2: Run the node tests**
 
 Run: `node js/data.test.js && node js/scenarios.test.js && node js/affect.test.js`
 Expected: three "passed" lines.
 
-- [ ] **Step 3: Syntax-check every browser module without a DOM**
+- [x] **Step 3: Syntax-check every browser module without a DOM**
 
 Run: `for f in js/media/tts.js js/media/recorder.js js/media/camera.js js/screens/chat-session.js js/screens/student.js; do node --check "$f" && echo "ok $f"; done`
 Expected: `ok` for each file.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add js/screens/student.js
@@ -1271,23 +1271,23 @@ git commit -m "feat: route chat scenarios through the new voice/camera chat sess
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Start the static preview** (`.claude/launch.json` → `static`, port 4173) and open `#/student/chat`.
+- [x] **Step 1: Start the static preview** (`.claude/launch.json` → `static`, port 4173) and open `#/student/chat`.
 
-- [ ] **Step 2: Picker → 학교폭력 피해.** Confirm: header shows `🔊 자동읽기 / ↺ / ✕`; the affect strip renders with the camera thumb; the privacy system notice is the first log item; the input bar is prefilled with the first `me` line; console has no errors.
+- [x] **Step 2: Picker → 학교폭력 피해.** Confirm: header shows `🔊 자동읽기 / ↺ / ✕`; the affect strip renders with the camera thumb; the privacy system notice is the first log item; the input bar is prefilled with the first `me` line; console has no errors.
 
-- [ ] **Step 3: Camera states.** With permission granted and a face in view: thumbnail shows landmark overlay, green ring on the thumb, `표정` label updates, no banner. Cover the camera: after ~1s the "카메라에 얼굴을 비춰주세요" banner appears and disappears when the face is back. With permission denied: "더 정확한 상담을 위해 카메라 권한을 허용해주세요" banner with a 허용하기 button.
+- [x] **Step 3: Camera states.** With permission granted and a face in view: thumbnail shows landmark overlay, green ring on the thumb, `표정` label updates, no banner. Cover the camera: after ~1s the "카메라에 얼굴을 비춰주세요" banner appears and disappears when the face is back. With permission denied: "더 정확한 상담을 위해 카메라 권한을 허용해주세요" banner with a 허용하기 button.
 
-- [ ] **Step 4: Text turn.** Click ➤ → me bubble appears; typing indicator → bot bubbles (two in a row for the violence script). Text bar in the strip rises (`때렸` → 0.80), risk pill updates.
+- [x] **Step 4: Text turn.** Click ➤ → me bubble appears; typing indicator → bot bubbles (two in a row for the violence script). Text bar in the strip rises (`때렸` → 0.80), risk pill updates.
 
-- [ ] **Step 5: Voice turn.** Click 🎤 → recording bar (red dot, timer, moving waveform). Click ■ → "음성을 텍스트로 변환하는 중…" → me bubble with "🎤 음성으로 말함" meta → bot continues. 음성 bar > 0.
+- [x] **Step 5: Voice turn.** Click 🎤 → recording bar (red dot, timer, moving waveform). Click ■ → "음성을 텍스트로 변환하는 중…" → me bubble with "🎤 음성으로 말함" meta → bot continues. 음성 bar > 0.
 
-- [ ] **Step 6: Photo turn.** Input bar shows "🖼️ 사진 첨부해서 보내기" → click → photo bubble → bot continues.
+- [x] **Step 6: Photo turn.** Input bar shows "🖼️ 사진 첨부해서 보내기" → click → photo bubble → bot continues.
 
-- [ ] **Step 7: TTS.** Click 🔊 듣기 on a bot bubble → button turns to ⏹ 정지 and bars animate; ends automatically. Toggle 🔊 자동읽기 → next bot bubble is read automatically.
+- [x] **Step 7: TTS.** Click 🔊 듣기 on a bot bubble → button turns to ⏹ 정지 and bars animate; ends automatically. Toggle 🔊 자동읽기 → next bot bubble is read automatically.
 
-- [ ] **Step 8: Finish + lifecycle.** After the last turn the input bar shows "다른 시나리오 보기" → returns to the picker and the camera light goes off. Mid-session, switch to `#/student/tests` and back: log and phase are intact, camera restarts.
+- [x] **Step 8: Finish + lifecycle.** After the last turn the input bar shows "다른 시나리오 보기" → returns to the picker and the camera light goes off. Mid-session, switch to `#/student/tests` and back: log and phase are intact, camera restarts.
 
-- [ ] **Step 9: Mark plan tasks complete and commit**
+- [x] **Step 9: Mark plan tasks complete and commit**
 
 ```bash
 git add docs/superpowers/plans/2026-09-10-audio-chat-affect.md
