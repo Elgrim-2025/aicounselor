@@ -1,10 +1,14 @@
 // Microphone capture for the "recording" input state. Only RMS levels are kept (for
 // the waveform and the simulated voice-tremor metric); no audio is stored or sent.
+// Sampling runs on a fixed interval (not requestAnimationFrame) so levels keep
+// accumulating even when the tab is throttled or hidden mid-recording.
+
+const SAMPLE_INTERVAL_MS = 50; // 20 samples/s
 
 export class MicRecorder {
   constructor(){
     this.stream = null; this.ctx = null; this.analyser = null; this.buf = null;
-    this.rms = []; this.startedAt = 0; this.raf = 0;
+    this.rms = []; this.startedAt = 0; this.timer = 0;
   }
 
   static async permissionState(){
@@ -16,7 +20,7 @@ export class MicRecorder {
     }catch{ return 'prompt'; }
   }
 
-  // onLevel(rms, elapsedMs) is called once per animation frame while recording.
+  // onLevel(rms, elapsedMs) is called every SAMPLE_INTERVAL_MS while recording.
   async start({ onLevel } = {}){
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('unsupported');
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -36,14 +40,13 @@ export class MicRecorder {
       const rms = Math.sqrt(sum / this.buf.length);
       this.rms.push(rms);
       onLevel && onLevel(rms, performance.now() - this.startedAt);
-      this.raf = requestAnimationFrame(tick);
     };
-    this.raf = requestAnimationFrame(tick);
+    this.timer = setInterval(tick, SAMPLE_INTERVAL_MS);
   }
 
   // Returns { durationMs, rms } and releases the mic.
   stop(){
-    cancelAnimationFrame(this.raf);
+    clearInterval(this.timer);
     const out = { durationMs: this.startedAt ? performance.now() - this.startedAt : 0, rms: this.rms };
     if(this.stream) this.stream.getTracks().forEach(t => t.stop());
     if(this.ctx) this.ctx.close().catch(() => {});
