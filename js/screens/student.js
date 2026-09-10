@@ -3,10 +3,9 @@ import {
   appendCheckin, getState,
   PHQ9_QUESTIONS, PHQ9_OPTIONS, scorePhq9, savePhq9Result,
 } from '../data.js';
-import { comingSoonBody } from '../components.js';
+import { comingSoonBody, escapeHtml } from '../components.js';
 import { SCENARIOS, scoreSurvey } from '../scenarios.js';
 
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // ---------- Chat: scenario picker + player (F-02, P0) ----------
 

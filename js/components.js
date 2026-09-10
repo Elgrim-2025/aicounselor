@@ -27,3 +27,7 @@ export function openReasonDialog({ title, message, onConfirm }){
   backdrop.querySelector('[data-cancel]').addEventListener('click', ()=>backdrop.remove());
   confirmBtn.addEventListener('click', ()=>{ onConfirm(textarea.value.trim()); backdrop.remove(); });
 }
+
+export function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
