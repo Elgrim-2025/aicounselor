@@ -13,6 +13,7 @@
   --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
 }
 *{box-sizing:border-box;}
+[hidden]{display:none !important;}
 html,body{margin:0;height:100%;background:var(--canvas);color:var(--ink);font-family:var(--sans);}
 #app{min-height:100vh;}
 button{font-family:inherit;cursor:pointer;}
